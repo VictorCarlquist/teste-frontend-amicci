@@ -1,23 +1,31 @@
 import { useEffect, useState } from "react";
+import { Button, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
+import Temperature from "./temperature";
+import WeatherDetail from "./weatherDetail";
+import Humidity from "./humidity";
+import WindSpeed from "./windSpeed";
 
 function Weather() {
   const [inputData, setInputData] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [address, setAddress] = useState("")
 
   useEffect(() => {
       if (search === "") {
          return;
       }
-      console.log(`${import.meta.env.VITE_MAPS_API_KEY}`);
 
       fetch(
          `https://maps.googleapis.com/maps/api/geocode/json?address=${search}&key=${import.meta.env.VITE_MAPS_API_KEY}`
       )
          .then((res) => res.json())
          .then((data) => {
+            console.log(data);
+
             let geometry = data.results[0].geometry.location;
             let lat = geometry.lat;
             let lng = geometry.lng;
+            setAddress(data.results[0].formatted_address);
             fetch(
                `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
             ).then((res) => res.json()).then((data) => {
@@ -87,25 +95,62 @@ function Weather() {
 
    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      setWeatherData(null);
       setSearch(inputData);
    }
 
    return (
       <>
-      <form onSubmit={handleSubmit}>
-      <input type="text" value={inputData} onChange={handleChange} />
-      <button type="submit">Search</button>
-      </form>
+      <Row>
+          <Col>
+            <div className='large-space'>
+               <h1>{address}</h1>
+            </div>
+          </Col>
+        </Row>
+      <Row>
+         <Col>
+            <Form onSubmit={handleSubmit}>
+               <InputGroup className="mb-3">
+                  <Form.Control
+                     placeholder="Recipient's username"
+                     aria-label="Recipient's username"
+                     aria-describedby="basic-addon2"
+                     value={inputData} onChange={handleChange}
+                  />
+                  <Button variant="outline-primary" type="submit">
+                     Buscar
+                  </Button>
+               </InputGroup>
+            </Form>
+         </Col>
+      </Row>
+      <Row>
          {weatherData === null ? (
-            <div>Loading...</div>
+            <Spinner animation="border" variant="info" />
          )
             : (
-               <div>
-                  <div>Temperature: {weatherData.main.temp}°C</div>
-                  <div>Weather: {weatherData.weather[0].description}</div>
-                  <div>Humidity: {weatherData.main.humidity}%</div>
-               </div>
+               <>
+                  <Row>
+
+               <Col>
+                  <WeatherDetail weatherDetail={weatherData.weather[0].description} ></WeatherDetail>
+               </Col>
+               </Row>
+               <Row>
+               <Col>
+                  <Temperature temperature={weatherData.main.temp}></Temperature>
+               </Col>
+               <Col>
+                  <Humidity humidity={weatherData.main.humidity}></Humidity>
+               </Col>
+               <Col>
+                  <WindSpeed windSpeed={weatherData.wind.speed}></WindSpeed>
+               </Col>
+                  </Row>
+               </>
             )}
+      </Row>
       </>
    );
 }

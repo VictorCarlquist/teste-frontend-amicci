@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { Card } from "react-bootstrap";
 
 function Temperature(props: { temperature: any; }) {
-  const [temperature, setTemperature] = useState<number | null>(props.temperature);
 
   return (
-    <div>
-      {temperature === null ? 'Loading...' : `Temperature: ${temperature}°C`}
-    </div>
+    <Card body className="card-glass-dark">
+      Temperatura: <br />{(props.temperature - 273.15).toFixed(2) }°C
+    </Card>
   );
 }
 

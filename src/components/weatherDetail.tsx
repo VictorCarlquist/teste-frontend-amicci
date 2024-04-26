@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { Card } from "react-bootstrap";
 
 function WeatherDetail(props: { weatherDetail: any; }) {
-  const [weatherDetail, setWeatherDetail] = useState<number | null>(props.weatherDetail);
 
   return (
-    <div>
-      {weatherDetail === null ? 'Loading...' : `weatherDetail: ${weatherDetail}°C`}
-    </div>
+    <Card className="card-glass-dark" body>
+      {props.weatherDetail}
+    </Card>
   );
 }
 

@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { Card } from "react-bootstrap";
 
 function Humidity(props: { humidity: any; }) {
-    const [humidity, setHumidity] = useState<number | null>(props.humidity);
     
     return (
-        <div>
-        {humidity === null ? 'Loading...' : `Humidity: ${humidity}%`}
-        </div>
+        <Card className="card-glass-dark" body>
+            Umidade: <br /> {props.humidity}%
+        </Card>
     );
 }
 

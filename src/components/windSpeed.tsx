@@ -1,10 +1,11 @@
+import { Card } from "react-bootstrap";
 
 
 function WindSpeed(props: { windSpeed: number }) {
     return (
-        <div>
-            Wind Speed: {props.windSpeed} m/s
-        </div>
+        <Card className="card-glass-dark" body>
+            Wind Speed: <br /> {props.windSpeed} m/s
+        </Card>
     );
 }
 
