@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import Temperature from "./temperature";
 import WeatherDetail from "./weatherDetail";
 import Humidity from "./humidity";
 import WindSpeed from "./windSpeed";
+import StatusWeather from "./statusWeather";
 
 function Weather() {
   const [inputData, setInputData] = useState<string>("");
@@ -15,7 +16,7 @@ function Weather() {
       fetch(
          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${
            import.meta.env.VITE_WEATHER_API_KEY
-         }`
+         }&lang=pt_br`
        )
          .then((res) => res.json())
          .then((data) => {
@@ -24,6 +25,7 @@ function Weather() {
             setWeatherData(data);
          });
    }
+
    const addrToGeo = (search: string) => {
       fetch(
          `https://maps.googleapis.com/maps/api/geocode/json?address=${search}&key=${
@@ -31,18 +33,22 @@ function Weather() {
       )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
+         if (!data.results[0] || !("geometry" in data.results[0])) {
+            setWeatherData({results: []});
+            return;
+         }
 
-        let geometry = data.results[0].geometry.location;
-        let lat = geometry.lat;
-        let lng = geometry.lng;
-        setAddress(data.results[0].formatted_address);
-        getWeather(lat, lng);
+         let geometry = data.results[0].geometry.location;
+         let lat = geometry.lat;
+         let lng = geometry.lng;
+         setAddress(data.results[0].formatted_address);
+         getWeather(lat, lng);
       });
   }
 
    useEffect(() => {
       if (search === "" && !userLocation) {
+         getUserLocation();
          return;
       }
 
@@ -54,7 +60,7 @@ function Weather() {
 
   }, [search, userLocation]);
 
-  const [weatherData, setWeatherData] = useState<any>();
+  const [weatherData, setWeatherData] = useState<any>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputData(e.target.value);
@@ -62,7 +68,7 @@ function Weather() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setWeatherData(null);
+    setWeatherData({});
     setSearch(inputData);
   };
 
@@ -82,7 +88,6 @@ function Weather() {
       console.error("Geolocation nça.");
     }
   };
-  getUserLocation();
 
   return (
     <>
@@ -112,8 +117,10 @@ function Weather() {
         </Col>
       </Row>
       <Row>
-        {!weatherData ? (
-          <Spinner animation="border" variant="info" />
+        {(!weatherData || !("weather" in weatherData)) ? (
+         <>
+          <StatusWeather data={weatherData}></StatusWeather>
+          </>
         ) : (
           <>
             <Row>
