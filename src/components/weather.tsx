@@ -73,7 +73,9 @@ function Weather() {
   };
 
   const getUserLocation = () => {
-    if (navigator.geolocation && !userLocation) {
+    if (navigator.geolocation) {
+      setWeatherData(null);
+      setSearch("");
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -85,7 +87,7 @@ function Weather() {
       );
     }
     else {
-      console.error("Geolocation nça.");
+      console.error("Geolocation.");
     }
   };
 
@@ -111,6 +113,9 @@ function Weather() {
               />
               <Button variant="outline-primary" type="submit">
                 Buscar
+              </Button>
+              <Button variant="outline-primary" onClick={getUserLocation}>
+                Ver clima local
               </Button>
             </InputGroup>
           </Form>
